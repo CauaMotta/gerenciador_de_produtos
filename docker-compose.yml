@@ -1,0 +1,26 @@
+services:
+  gerenciador-app:
+    build: ./Gerenciador_De_Produtos_BackEnd
+    container_name: gerenciador-app-container
+    ports:
+      - "8080:8080"
+    environment:
+      - DATASOURCE_URL=jdbc:postgresql://gerenciador-postgres:5432/gerenciadordb
+      - DATASOURCE_USERNAME=postgres
+      - DATASOURCE_PASSWORD=admin
+    depends_on:
+      - gerenciador-postgres
+
+  gerenciador-postgres:
+    image: postgres:latest
+    container_name: gerenciador-postgres-container
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=gerenciadordb
+    volumes:
+      - gerenciador-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  gerenciador-postgres-data:
