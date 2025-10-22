@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Interface de Repositório para a entidade {@code Produto}.
  * Extends {@code JpaRepository} para fornecer métodos CRUD básicos e funcionalidades
@@ -24,6 +26,18 @@ public interface IProdutoRepository extends JpaRepository<Produto, Long> {
      * @return Uma {@code Page} contendo os produtos ativos.
      */
     Page<Produto> findAllByDeletedAtIsNull(Pageable pageable);
+    /**
+     * Busca todos os produtos que não foram logicamente excluídos sem paginação.
+     *
+     * @return Uma {@code List} contendo todos os produtos ativos.
+     */
+    List<Produto> findAllByDeletedAtIsNull();
+    /**
+     * Busca todos os produtos que não foram logicamente excluídos sem paginação.
+     *
+     * @return Uma {@code List} contendo todos os produtos ativos.
+     */
+    List<Produto> findAllByDeletedAtIsNullAndCategoria(Categorias categorias);
     /**
      * Busca uma página de produtos que **não foram logicamente excluídos** e
      * pertencem a uma categoria específica.

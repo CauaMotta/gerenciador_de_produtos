@@ -2,6 +2,7 @@ package br.com.ocauamotta.GerenciadorDeProdutos.controllers;
 
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoRequestDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoResponseDTO;
+import br.com.ocauamotta.GerenciadorDeProdutos.dtos.TotalProdutosDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.services.ProdutoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,6 +69,18 @@ public class ProdutoController {
             Pageable pageable
     ) {
         return ResponseEntity.ok(service.findAllDeleted(categoria, sort, pageable));
+    }
+
+    /**
+     * Calcula a quantidade total de produtos ativos e o preço médio de acordo com a categoria,
+     * se não informada retorna o calculo de todos.
+     *
+     * @return {@code ResponseEntity} contendo o {@code TotalProdutosDTO} com a quantidade total
+     * de produtos ativos e o preço médio.
+     */
+    @GetMapping(value = "/calcular_total")
+    public ResponseEntity<TotalProdutosDTO> calcularTotal(@RequestParam(required = false) String categoria) {
+        return ResponseEntity.ok(service.calcularTotalDeProdutos(categoria));
     }
 
     /**

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * Esta classe representa um produto cadastrado no sistema.
@@ -40,9 +40,9 @@ public class Produto {
     @Column(nullable = false)
     private Categorias categoria;
     @Column
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
     @Column
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
     @Column
-    private LocalDateTime deletedAt;
+    private ZonedDateTime deletedAt;
 }

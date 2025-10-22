@@ -2,6 +2,7 @@ package br.com.ocauamotta.GerenciadorDeProdutos.controllers;
 
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoRequestDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoResponseDTO;
+import br.com.ocauamotta.GerenciadorDeProdutos.dtos.TotalProdutosDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.enums.Categorias;
 import br.com.ocauamotta.GerenciadorDeProdutos.services.ProdutoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,8 +43,10 @@ class ProdutoControllerTest {
      */
     @BeforeEach
     void setUp() {
+        ZonedDateTime time = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+
         produtoDTO = new ProdutoResponseDTO(1L, "Camisa Vermelha", 1000,
-                Categorias.CLOTHES, LocalDateTime.now(), LocalDateTime.now(), null);
+                Categorias.CLOTHES, time, time, null);
     }
 
     /**
@@ -137,8 +141,9 @@ class ProdutoControllerTest {
     @Test
     void deveRetornarPaginaDeProdutosDeletados() {
         Pageable pageable = PageRequest.of(0, 10);
+        ZonedDateTime time = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
         produtoDTO = new ProdutoResponseDTO(1L, "Camisa Vermelha", 1000,
-                Categorias.CLOTHES, LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now());
+                Categorias.CLOTHES, time, time, time);
         Page<ProdutoResponseDTO> page = new PageImpl<>(List.of(produtoDTO));
 
         when(service.findAllDeleted(null, "id,asc", pageable)).thenReturn(page);
@@ -150,5 +155,26 @@ class ProdutoControllerTest {
         assertEquals("Camisa Vermelha", response.getBody().getContent().get(0).nome());
         assertNotNull(response.getBody().getContent().get(0).deletedAt());
         verify(service, times(1)).findAllDeleted(null, "id,asc", pageable);
+    }
+
+    /**
+     * Testa o endpoint GET /produtos/calcular_total.
+     * Deve retornar o {@code TotalProdutosDTO} calculado pelo serviço com status 200 (OK).
+     * Verifica se a quantidade e o preço médio estão sendo retornados corretamente.
+     */
+    @Test
+    void deveRetornarTotalDeProdutosComSucesso() throws Exception {
+        TotalProdutosDTO dto = new TotalProdutosDTO(5, 1200);
+        when(service.calcularTotalDeProdutos(null)).thenReturn(dto);
+
+        ResponseEntity<TotalProdutosDTO> response = controller.calcularTotal(null);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertEquals(5, response.getBody().qntProdutos());
+        assertEquals(1200, response.getBody().precoMedio());
+
+        verify(service, times(1)).calcularTotalDeProdutos(null);
     }
 }

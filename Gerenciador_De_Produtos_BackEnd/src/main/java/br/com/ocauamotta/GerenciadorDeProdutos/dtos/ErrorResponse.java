@@ -1,6 +1,7 @@
 package br.com.ocauamotta.GerenciadorDeProdutos.dtos;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * DTO usado para padronizar as respostas de erro da API.
@@ -18,7 +19,7 @@ public record ErrorResponse(
         String error,
         String message,
         String path,
-        LocalDateTime timestamp
+        ZonedDateTime timestamp
 ) {
     /**
      * Construtor auxiliar que define automaticamente
@@ -30,6 +31,6 @@ public record ErrorResponse(
      * @param path O URI que foi acessado.
      */
     public ErrorResponse(int status, String error, String message, String path) {
-        this(status, error, message, path, LocalDateTime.now());
+        this(status, error, message, path, ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
     }
 }

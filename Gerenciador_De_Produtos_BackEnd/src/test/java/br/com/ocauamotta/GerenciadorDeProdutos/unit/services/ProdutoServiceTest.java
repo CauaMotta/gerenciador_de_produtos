@@ -2,6 +2,7 @@ package br.com.ocauamotta.GerenciadorDeProdutos.services;
 
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoRequestDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoResponseDTO;
+import br.com.ocauamotta.GerenciadorDeProdutos.dtos.TotalProdutosDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.enums.Categorias;
 import br.com.ocauamotta.GerenciadorDeProdutos.exceptions.BadRequestException;
 import br.com.ocauamotta.GerenciadorDeProdutos.exceptions.EntityNotFoundException;
@@ -15,7 +16,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,13 +48,15 @@ class ProdutoServiceTest {
      */
     @BeforeEach
     void setUp() {
+        ZonedDateTime time = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+
         produto = new Produto();
         produto.setId(1L);
         produto.setNome("Camisa Vermelha");
         produto.setPreco(1000);
         produto.setCategoria(Categorias.CLOTHES);
-        produto.setCreatedAt(LocalDateTime.now());
-        produto.setUpdatedAt(LocalDateTime.now());
+        produto.setCreatedAt(time);
+        produto.setUpdatedAt(time);
     }
 
     /**
@@ -212,7 +218,7 @@ class ProdutoServiceTest {
      */
     @Test
     void deveBuscarTodosProdutosApagadosSemFiltro() {
-        produto.setDeletedAt(LocalDateTime.now());
+        produto.setDeletedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
         Page<Produto> page = new PageImpl<>(List.of(produto));
         Pageable pageable = PageRequest.of(0, 10);
 
@@ -229,7 +235,7 @@ class ProdutoServiceTest {
      */
     @Test
     void deveBuscarProdutosApagadosPorCategoria() {
-        produto.setDeletedAt(LocalDateTime.now());
+        produto.setDeletedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
         Page<Produto> page = new PageImpl<>(List.of(produto));
         Pageable pageable = PageRequest.of(0, 10);
 
@@ -239,5 +245,47 @@ class ProdutoServiceTest {
 
         assertEquals(1, result.getContent().size());
         assertEquals("Camisa Vermelha", result.getContent().get(0).nome());
+    }
+
+    /**
+     * Testa o cálculo correto do total de produtos ativos e do preço médio.
+     * Simula uma lista de produtos ativos e verifica se o serviço calcula a
+     * quantidade total e a média dos preços.
+     */
+    @Test
+    void deveCalcularTotalEPrecoMedioCorretamente() {
+        Produto p1 = new Produto();
+        p1.setPreco(1000);
+
+        Produto p2 = new Produto();
+        p2.setPreco(2000);
+
+        List<Produto> produtos = Arrays.asList(p1, p2);
+
+        when(repository.findAllByDeletedAtIsNull()).thenReturn(produtos);
+
+
+        TotalProdutosDTO resultado = service.calcularTotalDeProdutos(null);
+
+        assertEquals(2, resultado.qntProdutos());
+        assertEquals(1500, resultado.precoMedio());
+
+        verify(repository, times(1)).findAllByDeletedAtIsNull();
+    }
+
+    /**
+     * Testa o cenário onde não há produtos ativos.
+     * Deve garantir que a quantidade de produtos e o preço médio retornem zero,
+     * evitando a exceção de divisão por zero.
+     */
+    @Test
+    void deveRetornarZerosQuandoNaoHouverProdutos() {
+        when(repository.findAllByDeletedAtIsNull()).thenReturn(Collections.emptyList());
+
+        TotalProdutosDTO resultado = service.calcularTotalDeProdutos(null);
+
+        // Assert
+        assertEquals(0, resultado.qntProdutos());
+        assertEquals(0, resultado.precoMedio());
     }
 }

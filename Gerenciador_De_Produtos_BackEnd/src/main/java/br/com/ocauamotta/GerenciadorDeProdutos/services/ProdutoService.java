@@ -2,6 +2,7 @@ package br.com.ocauamotta.GerenciadorDeProdutos.services;
 
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoRequestDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoResponseDTO;
+import br.com.ocauamotta.GerenciadorDeProdutos.dtos.TotalProdutosDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.enums.Categorias;
 import br.com.ocauamotta.GerenciadorDeProdutos.exceptions.BadRequestException;
 import br.com.ocauamotta.GerenciadorDeProdutos.exceptions.EntityNotFoundException;
@@ -15,6 +16,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Classe de Serviço responsável por implementar as regras de negócio
@@ -32,6 +37,31 @@ public class ProdutoService {
      */
     public ProdutoService(IProdutoRepository repository) {
         this.repository = repository;
+    }
+
+    /**
+     * Calcula o total de produtos ativos no sistema e o preço médio desses produtos
+     * de acordo com a categoria, se não informada retorna o calculo de todos.
+     * Produtos logicamente excluídos (com {@code deletedAt} preenchido) são ignorados.
+     *
+     * <p>Se não houver produtos ativos, o total de produtos e o preço médio retornados serão zero.</p>
+     *
+     * @return Um {@code TotalProdutosDTO} contendo a quantidade total de produtos ativos
+     * e o preço médio.
+     */
+    public TotalProdutosDTO calcularTotalDeProdutos(String categoria) {
+        List<Produto> produtos;
+        if (categoria != null) {
+            produtos = repository.findAllByDeletedAtIsNullAndCategoria(Categorias.fromString(categoria));
+        } else {
+            produtos = repository.findAllByDeletedAtIsNull();
+        }
+
+        Integer qntProdutos = produtos.size();
+        Integer precos = produtos.stream().map(Produto::getPreco).reduce(0, Integer::sum);
+        Integer precoMedio = qntProdutos > 0 ? precos / qntProdutos : 0;
+
+        return new TotalProdutosDTO(qntProdutos, precoMedio);
     }
 
     /**
@@ -98,14 +128,14 @@ public class ProdutoService {
      * @return O {@code ProdutoResponseDTO} do produto salvo.
      */
     public ProdutoResponseDTO save(ProdutoRequestDTO produtoRequestDTO) {
-        LocalDateTime localDateTime = LocalDateTime.now();
+        ZonedDateTime time = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
         Produto produto = new Produto();
         produto.setNome(produtoRequestDTO.nome());
         produto.setPreco(produtoRequestDTO.preco());
         produto.setCategoria(Categorias.fromString(produtoRequestDTO.categoria()));
-        produto.setCreatedAt(localDateTime);
-        produto.setUpdatedAt(localDateTime);
+        produto.setCreatedAt(time);
+        produto.setUpdatedAt(time);
 
         return ProdutoMapper.toResponseDTO(repository.save(produto));
     }
@@ -144,7 +174,7 @@ public class ProdutoService {
         Produto entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com ID: " + id));
 
-        entity.setDeletedAt(LocalDateTime.now());
+        entity.setDeletedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
 
         repository.save(entity);
     }
@@ -164,7 +194,7 @@ public class ProdutoService {
         if (dto.preco() != null) entity.setPreco(dto.preco());
         if (dto.categoria() != null && !dto.categoria().isBlank())
             entity.setCategoria(Categorias.fromString(dto.categoria()));
-        entity.setUpdatedAt(localDateTime);
+        entity.setUpdatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
     }
 
     /**

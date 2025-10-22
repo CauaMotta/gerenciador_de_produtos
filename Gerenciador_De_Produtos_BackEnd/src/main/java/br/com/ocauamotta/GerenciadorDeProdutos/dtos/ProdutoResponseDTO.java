@@ -2,7 +2,7 @@ package br.com.ocauamotta.GerenciadorDeProdutos.dtos;
 
 import br.com.ocauamotta.GerenciadorDeProdutos.enums.Categorias;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * DTO de resposta para a entidade {@code Produto}.
@@ -16,7 +16,7 @@ public record ProdutoResponseDTO(
         String nome,
         Integer preco,
         Categorias categoria,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        LocalDateTime deletedAt
+        ZonedDateTime createdAt,
+        ZonedDateTime updatedAt,
+        ZonedDateTime deletedAt
 ) {}
