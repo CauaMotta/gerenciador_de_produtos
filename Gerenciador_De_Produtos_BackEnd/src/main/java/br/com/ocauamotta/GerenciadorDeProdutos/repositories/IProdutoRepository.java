@@ -1,5 +1,6 @@
 package br.com.ocauamotta.GerenciadorDeProdutos.repositories;
 
+import br.com.ocauamotta.GerenciadorDeProdutos.enums.Categorias;
 import br.com.ocauamotta.GerenciadorDeProdutos.models.Produto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,4 +24,30 @@ public interface IProdutoRepository extends JpaRepository<Produto, Long> {
      * @return Uma {@code Page} contendo os produtos ativos.
      */
     Page<Produto> findAllByDeletedAtIsNull(Pageable pageable);
+    /**
+     * Busca uma página de produtos que **não foram logicamente excluídos** e
+     * pertencem a uma categoria específica.
+     *
+     * @param categorias O valor do enum {@code Categorias} para filtro.
+     * @param pageable Objeto que contém informações de paginação.
+     * @return Uma {@code Page} contendo os produtos ativos e filtrados pela categoria.
+     */
+    Page<Produto> findAllByDeletedAtIsNullAndCategoria(Categorias categorias, Pageable pageable);
+    /**
+     * Busca uma página de produtos que **foram logicamente excluídos**
+     * (ou seja, onde o campo {@code deletedAt} **não** é nulo).
+     *
+     * @param pageable Objeto que contém informações de paginação.
+     * @return Uma {@code Page} contendo os produtos inativos.
+     */
+    Page<Produto> findAllByDeletedAtIsNotNull(Pageable pageable);
+    /**
+     * Busca uma página de produtos que **foram logicamente excluídos** e
+     * pertencem a uma categoria específica.
+     *
+     * @param categorias O valor do enum {@code Categorias} para filtro.
+     * @param pageable Objeto que contém informações de paginação.
+     * @return Uma {@code Page} contendo os produtos inativos e filtrados pela categoria.
+     */
+    Page<Produto> findAllByDeletedAtIsNotNullAndCategoria(Categorias categorias, Pageable pageable);
 }

@@ -36,6 +36,7 @@ public class Produto {
     private String nome;
     @Column(nullable = false)
     private Integer preco;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Categorias categoria;
     @Column

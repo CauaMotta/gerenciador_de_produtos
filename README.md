@@ -12,7 +12,6 @@ A persistência dos dados é feita em PostgreSQL, assegurando consistência e co
 - [**Spring Data JPA**](https://spring.io/projects/spring-data-jpa) — Abstração para persistência de dados
 - [**Hibernate**](https://hibernate.org/) - Mapeamento objeto-relacional (ORM)
 - [**Spring Web**](https://docs.spring.io/spring-framework/reference/web.html) — Criação de endpoints
-- [**Spring Validation**](https://docs.spring.io/spring-framework/reference/core/validation.html) - Validação de dados de entrada
 - [**PostgreSQL**](https://www.postgresql.org/) — Banco de dados relacional
 - [**Lombok**](https://projectlombok.org/) — Aumento da produtividade com redução de código repetitivo (getters, setters, builders, etc.)
 - [**JUnit 4**](https://junit.org/junit5/) — Testes unitários e de integração
@@ -43,5 +42,5 @@ cd Gerenciador_De_Produtos_BackEnd
 
 - Iniciar e configurar o projeto ✅
 - Criar CRUD completo de produtos (Create, Read, Update, Delete) ✅
-- Adicionar listagem de produtos com filtros por **categoria**
-- Adicionar ordenação por **preço**
+- Adicionar listagem de produtos com filtros por **categoria** ✅
+- Adicionar ordenação por **preço** ✅

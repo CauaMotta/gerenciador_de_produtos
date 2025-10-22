@@ -9,7 +9,9 @@ import br.com.ocauamotta.GerenciadorDeProdutos.mappers.ProdutoMapper;
 import br.com.ocauamotta.GerenciadorDeProdutos.models.Produto;
 import br.com.ocauamotta.GerenciadorDeProdutos.repositories.IProdutoRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,14 +35,45 @@ public class ProdutoService {
     }
 
     /**
-     * Busca todos os produtos ativos (aqueles que possuem {@code deletedAt} null)
-     * e os retorna de forma paginada.
+     * Busca todos os produtos ativos (aqueles que possuem {@code deletedAt} null),
+     * podendo filtrar por categoria e ordenar de acordo com o parâmetro {@code sort}.
      *
-     * @param pageable Objeto de paginação e ordenação.
+     * @param categoria Categoria opcional para filtrar os produtos.
+     * @param sort      Campo e direção de ordenação (ex: "preco,asc" ou "preco,desc").
+     * @param pageable  Objeto de paginação.
      * @return Uma {@code Page} de {@code ProdutoResponseDTO} dos produtos ativos.
      */
-    public Page<ProdutoResponseDTO> findAllActive(Pageable pageable) {
-        return repository.findAllByDeletedAtIsNull(pageable).map(ProdutoMapper::toResponseDTO);
+    public Page<ProdutoResponseDTO> findAllActive(String categoria, String sort, Pageable pageable) {
+        Pageable sortedPageable = sortPage(pageable, sort);
+
+        if (categoria != null && !categoria.isBlank()) {
+            return repository.findAllByDeletedAtIsNullAndCategoria(Categorias.fromString(categoria), sortedPageable)
+                    .map(ProdutoMapper::toResponseDTO);
+        } else {
+            return repository.findAllByDeletedAtIsNull(sortedPageable)
+                    .map(ProdutoMapper::toResponseDTO);
+        }
+    }
+
+    /**
+     * Busca todos os produtos deletados,
+     * podendo filtrar por categoria e ordenar de acordo com o parâmetro {@code sort}.
+     *
+     * @param categoria Categoria opcional para filtrar os produtos.
+     * @param sort      Campo e direção de ordenação (ex: "preco,asc" ou "preco,desc").
+     * @param pageable  Objeto de paginação.
+     * @return Uma {@code Page} de {@code ProdutoResponseDTO} dos produtos deletados.
+     */
+    public Page<ProdutoResponseDTO> findAllDeleted(String categoria, String sort, Pageable pageable) {
+        Pageable sortedPageable = sortPage(pageable, sort);
+
+        if (categoria != null && !categoria.isBlank()) {
+            return repository.findAllByDeletedAtIsNotNullAndCategoria(Categorias.fromString(categoria), sortedPageable)
+                    .map(ProdutoMapper::toResponseDTO);
+        } else {
+            return repository.findAllByDeletedAtIsNotNull(sortedPageable)
+                    .map(ProdutoMapper::toResponseDTO);
+        }
     }
 
     /**
@@ -82,10 +115,10 @@ public class ProdutoService {
      * Primeiro busca a entidade, lança {@code EntityNotFoundException} se não existir,
      * e então aplica as modificações.
      *
-     * @param id O ID do produto a ser atualizado.
+     * @param id                O ID do produto a ser atualizado.
      * @param produtoRequestDTO O DTO de requisição com os novos dados.
      * @return O {@code ProdutoResponseDTO} do produto atualizado.
-     * @throws BadRequestException Se o ID não for fornecido na requisição.
+     * @throws BadRequestException     Se o ID não for fornecido na requisição.
      * @throws EntityNotFoundException Se o produto com o ID fornecido não for encontrado.
      */
     public ProdutoResponseDTO update(Long id, ProdutoRequestDTO produtoRequestDTO) {
@@ -123,14 +156,45 @@ public class ProdutoService {
      * Atualiza o campo {@code updatedAt}.
      *
      * @param entity A entidade {@code Produto} a ser modificada.
-     * @param dto O DTO de requisição com os dados de atualização.
+     * @param dto    O DTO de requisição com os dados de atualização.
      */
     private void updateEntity(Produto entity, ProdutoRequestDTO dto) {
         LocalDateTime localDateTime = LocalDateTime.now();
 
         if (dto.nome() != null && !dto.nome().isBlank()) entity.setNome(dto.nome());
         if (dto.preco() != null) entity.setPreco(dto.preco());
-        if (dto.categoria() != null && !dto.categoria().isBlank()) entity.setCategoria(Categorias.fromString(dto.categoria()));
+        if (dto.categoria() != null && !dto.categoria().isBlank())
+            entity.setCategoria(Categorias.fromString(dto.categoria()));
         entity.setUpdatedAt(localDateTime);
+    }
+
+    /**
+     * Define um {@code Pageable} incorporando as informações de ordenação
+     * fornecidas pelo parâmetro {@code sort}.
+     *
+     * <p>O parâmetro {@code sort} deve estar no formato "campo,direção" (ex: "nome,asc" ou "preco,desc").
+     * Se a direção não for especificada ou for inválida, o padrão é ascendente (ASC).</p>
+     *
+     * @param pageable O {@code Pageable} original contendo informações de número da página e tamanho.
+     * @param sort A string de ordenação, que pode ser nula ou em branco.
+     * @return Um novo {@code Pageable} com as informações de ordenação aplicadas, ou o {@code Pageable}
+     * original se a string de ordenação for nula ou vazia.
+     */
+    private Pageable sortPage(Pageable pageable, String sort) {
+        Pageable sortedPageable = pageable;
+        if (sort != null && !sort.isBlank()) {
+            String[] sortParams = sort.split(",");
+            String sortField = sortParams[0];
+            Sort.Direction direction = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("desc")
+                    ? Sort.Direction.DESC
+                    : Sort.Direction.ASC;
+
+            sortedPageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(direction, sortField)
+            );
+        }
+        return sortedPageable;
     }
 }

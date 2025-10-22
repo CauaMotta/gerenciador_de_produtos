@@ -2,7 +2,6 @@ package br.com.ocauamotta.GerenciadorDeProdutos.controllers;
 
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoRequestDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoResponseDTO;
-import br.com.ocauamotta.GerenciadorDeProdutos.exceptions.BadRequestException;
 import br.com.ocauamotta.GerenciadorDeProdutos.services.ProdutoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,14 +29,45 @@ public class ProdutoController {
     }
 
     /**
-     * Busca e retorna uma página de todos os produtos cadastrados ativos.
+     * Busca e retorna uma página de todos os produtos cadastrados ativos, com suporte a filtragem e ordenação customizada.
+     * A listagem considera apenas produtos que não foram logicamente excluídos (soft delete).
      *
-     * @param pageable Objeto que contém informações de paginação (número da página, tamanho e ordenação).
-     * @return {@code ResponseEntity} contendo um {@code Page} de {@code ProdutoResponseDTO}.
+     * <p>Exemplo de requisição sem filtro: {@code GET /produtos?page=0&size=10}</p>
+     * <p>Exemplo de requisição com filtro e ordenação customizada: {@code GET /produtos?categoria=roupas&sort=preco,desc&size=5}</p>
+     *
+     * @param categoria (Opcional) O nome da categoria a ser filtrada.
+     * @param sort (Opcional, Padrão: "id,asc") Define os campos e a direção da ordenação (ex: "preco,asc" ou "preco,desc").
+     * @param pageable Objeto que contém informações de paginação.
+     * @return {@code ResponseEntity} contendo um {@code Page} de {@code ProdutoResponseDTO} dos produtos ativos.
      */
     @GetMapping
-    public ResponseEntity<Page<ProdutoResponseDTO>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(service.findAllActive(pageable));
+    public ResponseEntity<Page<ProdutoResponseDTO>> findAllActive(
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false, defaultValue = "id,asc") String sort,
+            Pageable pageable
+            ) {
+        return ResponseEntity.ok(service.findAllActive(categoria, sort, pageable));
+    }
+
+    /**
+     * Busca e retorna uma página de todos os produtos deletados, com suporte a filtragem e ordenação customizada.
+     * A listagem considera apenas produtos que foram logicamente excluídos (soft delete).
+     *
+     * <p>Exemplo de requisição sem filtro: {@code GET /produtos/apagados?page=0&size=10}</p>
+     * <p>Exemplo de requisição com filtro e ordenação customizada: {@code GET /produtos/apagados?categoria=roupas&sort=preco,desc&size=5}</p>
+     *
+     * @param categoria (Opcional) O nome da categoria a ser filtrada.
+     * @param sort (Opcional, Padrão: "id,asc") Define os campos e a direção da ordenação (ex: "preco,asc" ou "preco,desc").
+     * @param pageable Objeto que contém informações de paginação.
+     * @return {@code ResponseEntity} contendo um {@code Page} de {@code ProdutoResponseDTO} dos produtos apagados.
+     */
+    @GetMapping(value = "/apagados")
+    public ResponseEntity<Page<ProdutoResponseDTO>> findAllDeleted(
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false, defaultValue = "id,asc") String sort,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(service.findAllDeleted(categoria, sort, pageable));
     }
 
     /**
