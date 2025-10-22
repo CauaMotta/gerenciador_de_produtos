@@ -144,8 +144,7 @@ public class ProdutoService {
         Produto entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com ID: " + id));
 
-        LocalDateTime localDateTime = LocalDateTime.now();
-        entity.setDeletedAt(localDateTime);
+        entity.setDeletedAt(LocalDateTime.now());
 
         repository.save(entity);
     }

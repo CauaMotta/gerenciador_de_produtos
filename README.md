@@ -14,7 +14,8 @@ A persistência dos dados é feita em PostgreSQL, assegurando consistência e co
 - [**Spring Web**](https://docs.spring.io/spring-framework/reference/web.html) — Criação de endpoints
 - [**PostgreSQL**](https://www.postgresql.org/) — Banco de dados relacional
 - [**Lombok**](https://projectlombok.org/) — Aumento da produtividade com redução de código repetitivo (getters, setters, builders, etc.)
-- [**JUnit 4**](https://junit.org/junit5/) — Testes unitários e de integração
+- [**JUnit**](https://junit.org/junit5/) — Testes unitários e de integração
+- [**Mockito**](https://site.mockito.org/) — Framework para criação de mocks em testes unitários
 - [**Maven**](https://maven.apache.org/) — Gerenciador de dependências e build
 
 ## 📦 Instalação e Execução
@@ -44,3 +45,4 @@ cd Gerenciador_De_Produtos_BackEnd
 - Criar CRUD completo de produtos (Create, Read, Update, Delete) ✅
 - Adicionar listagem de produtos com filtros por **categoria** ✅
 - Adicionar ordenação por **preço** ✅
+- Criar testes unitários ✅
