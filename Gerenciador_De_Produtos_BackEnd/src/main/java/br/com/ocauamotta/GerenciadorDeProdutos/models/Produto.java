@@ -2,32 +2,41 @@ package br.com.ocauamotta.GerenciadorDeProdutos.models;
 
 import br.com.ocauamotta.GerenciadorDeProdutos.enums.Categorias;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 /**
  * Esta classe representa um produto cadastrado no sistema.
  *
- * A entidade é mapeada para a tabela "produtos" no banco de dados
- * e contém informações como nome, preço, categoria e datas de criação, atualização e exclusão.
+ * <p>A entidade é mapeada para a tabela "produtos" no banco de dados
+ * e contém informações como ID, nome, preço, categoria e datas de criação, atualização e exclusão.</p>
  *
- * Os campos createdAt, updatedAt e deletedAt são úteis para
+ * <p>Os campos createdAt, updatedAt e deletedAt são úteis para
  * controle e versionamento de registros, permitindo implementar
- * exclusão lógica e histórico de alterações.
+ * exclusão lógica e histórico de alterações.</p>
  *
- * @author Cauã Motta
+ * <p>Esta classe utiliza anotações JPA para persistência de dados e anotações Lombok
+ * para geração automática de getters, setters e construtores.</p>
  */
 @Entity
 @Table(name = "produtos")
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
+    @Column(length = 150, nullable = false)
     private String nome;
-    @Column
+    @Column(nullable = false)
     private Integer preco;
-    @Column
+    @Column(nullable = false)
     private Categorias categoria;
     @Column
     private LocalDateTime createdAt;

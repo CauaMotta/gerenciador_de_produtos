@@ -42,6 +42,6 @@ cd Gerenciador_De_Produtos_BackEnd
 ## 🚧 Próximos Passos
 
 - Iniciar e configurar o projeto ✅
-- Criar CRUD completo de produtos (Create, Read, Update, Delete)
+- Criar CRUD completo de produtos (Create, Read, Update, Delete) ✅
 - Adicionar listagem de produtos com filtros por **categoria**
 - Adicionar ordenação por **preço**
