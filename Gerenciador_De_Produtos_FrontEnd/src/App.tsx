@@ -1,5 +1,14 @@
+import MainContent from './components/MainContent'
+
+import { GlobalStyle } from './styles'
+
 function App() {
-  return <></>
+  return (
+    <>
+      <GlobalStyle />
+      <MainContent />
+    </>
+  )
 }
 
 export default App
