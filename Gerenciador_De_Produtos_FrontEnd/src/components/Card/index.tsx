@@ -17,7 +17,7 @@ type Props = {
 }
 
 const Card = ({ produto }: Props) => {
-  const { mutate, data, loading, error } = useApiMutation<Produto, Produto>()
+  const { mutate, data, loading } = useApiMutation<Produto, Produto>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 

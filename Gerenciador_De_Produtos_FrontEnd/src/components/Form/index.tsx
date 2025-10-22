@@ -25,10 +25,7 @@ type FormProps = {
 }
 
 const Form = ({ produto }: FormProps) => {
-  const { mutate, data, loading, error } = useApiMutation<
-    CreateProduto,
-    Produto
-  >()
+  const { mutate, data, loading } = useApiMutation<CreateProduto, Produto>()
 
   const form = useFormik({
     initialValues: {
@@ -77,7 +74,10 @@ const Form = ({ produto }: FormProps) => {
       </div>
     )
 
-  if (data) return window.location.reload()
+  if (data) {
+    window.location.reload()
+    return null
+  }
 
   return (
     <Container>
