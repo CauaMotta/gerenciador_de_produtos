@@ -10,8 +10,6 @@ RUN npm run build
 
 # Estágio 2: Runtime
 FROM nginx:alpine
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/*
 COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80

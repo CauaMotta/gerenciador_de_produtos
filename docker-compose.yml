@@ -1,13 +1,16 @@
 services:
   gerenciador-frontend:
-    build: ./Gerenciador_De_Produtos_FrontEnd
+    build:
+      context: ./Gerenciador_De_Produtos_FrontEnd
+      args:
+        VITE_API_URL: http://localhost:8080
     container_name: gerenciador-front-container
     ports:
       - '3000:80'
-    environment:
-      - VITE_API_URL=http://gerenciador-backend:8080
     depends_on:
       - gerenciador-backend
+    networks:
+      - gerenciador_network
 
   gerenciador-backend:
     build: ./Gerenciador_De_Produtos_BackEnd
@@ -20,6 +23,8 @@ services:
       - DATASOURCE_PASSWORD=admin
     depends_on:
       - gerenciador-postgres
+    networks:
+      - gerenciador_network
 
   gerenciador-postgres:
     image: postgres:latest
@@ -31,6 +36,12 @@ services:
       - POSTGRES_DB=gerenciadordb
     volumes:
       - gerenciador-postgres-data:/var/lib/postgresql/data
+    networks:
+      - gerenciador_network
+
+networks:
+  gerenciador_network:
+    driver: bridge
 
 volumes:
   gerenciador-postgres-data:
