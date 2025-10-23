@@ -29,7 +29,7 @@ cd Gerenciador_De_Produtos_BackEnd
 
 # Necessário configurar o banco de dados Postgres e as váriaveis de ambiente
 
-#2º passo: executar o servidor frontend
+# 2º passo: executar o servidor frontend
 # Acesse a pasta
 cd ../Gerenciador_De_Produtos_FrontEnd
 
