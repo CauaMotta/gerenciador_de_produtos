@@ -5,37 +5,46 @@ import br.com.ocauamotta.GerenciadorDeProdutos.dtos.ProdutoResponseDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.dtos.TotalProdutosDTO;
 import br.com.ocauamotta.GerenciadorDeProdutos.enums.Categorias;
 import br.com.ocauamotta.GerenciadorDeProdutos.services.ProdutoService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.*;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * Classe de testes unitários para a classe de controller ({@code ProdutoController}).
- * Utiliza Mockito para simular o comportamento da camada de serviço ({@code ProdutoService})
- * e verificar a interação e o formato das respostas HTTP.
+ * Utiliza {@code MockMvc} para simular requisições HTTP e verificar as respostas.
+ * A camada de serviço ({@code ProdutoService}) é mockada com {@code @MockitoBean}.
  */
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(ProdutoController.class)
 class ProdutoControllerTest {
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockitoBean
     private ProdutoService service;
 
-    @InjectMocks
-    private ProdutoController controller;
-
     private ProdutoResponseDTO produtoDTO;
+    private ZonedDateTime time;
 
     /**
      * Configuração inicial executada antes de cada teste.
@@ -43,7 +52,7 @@ class ProdutoControllerTest {
      */
     @BeforeEach
     void setUp() {
-        ZonedDateTime time = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+        time = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
         produtoDTO = new ProdutoResponseDTO(1L, "Camisa Vermelha", 1000,
                 Categorias.CLOTHES, time, time, null);
@@ -54,14 +63,16 @@ class ProdutoControllerTest {
      * Deve retornar um produto com status 200 (OK) quando o ID for encontrado.
      */
     @Test
-    void deveRetornarProdutoQuandoIdExistir() {
+    void deveRetornarProdutoQuandoIdExistir() throws Exception {
         when(service.findById(1L)).thenReturn(produtoDTO);
 
-        ResponseEntity<ProdutoResponseDTO> response = controller.findById(1L);
+        mockMvc.perform(get("/produtos/{id}", 1L)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nome").value("Camisa Vermelha"));
 
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Camisa Vermelha", response.getBody().nome());
         verify(service, times(1)).findById(1L);
     }
 
@@ -70,16 +81,19 @@ class ProdutoControllerTest {
      * Deve salvar um novo produto e retornar o DTO salvo com status 200 (OK).
      */
     @Test
-    void deveSalvarProdutoComSucesso() {
+    void deveSalvarProdutoComSucesso() throws Exception {
         ProdutoRequestDTO request = new ProdutoRequestDTO("Camisa Vermelha", 1000, "roupas");
-        when(service.save(request)).thenReturn(produtoDTO);
 
-        ResponseEntity<ProdutoResponseDTO> response = controller.save(request);
+        when(service.save(any(ProdutoRequestDTO.class))).thenReturn(produtoDTO);
 
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Camisa Vermelha", response.getBody().nome());
-        verify(service, times(1)).save(request);
+        mockMvc.perform(post("/produtos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nome").value("Camisa Vermelha"));
+
+        verify(service, times(1)).save(any(ProdutoRequestDTO.class));
     }
 
     /**
@@ -87,16 +101,19 @@ class ProdutoControllerTest {
      * Deve atualizar um produto existente e retornar o DTO atualizado com status 200 (OK).
      */
     @Test
-    void deveAtualizarProdutoComSucesso() {
+    void deveAtualizarProdutoComSucesso() throws Exception {
         ProdutoRequestDTO request = new ProdutoRequestDTO("Camisa Vermelha", 1000, "roupas");
-        when(service.update(1L, request)).thenReturn(produtoDTO);
 
-        ResponseEntity<ProdutoResponseDTO> response = controller.update(1L, request);
+        when(service.update(eq(1L), any(ProdutoRequestDTO.class))).thenReturn(produtoDTO);
 
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Camisa Vermelha", response.getBody().nome());
-        verify(service, times(1)).update(1L, request);
+        mockMvc.perform(put("/produtos/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nome").value("Camisa Vermelha"));
+
+        verify(service, times(1)).update(eq(1L), any(ProdutoRequestDTO.class));
     }
 
     /**
@@ -104,14 +121,13 @@ class ProdutoControllerTest {
      * Deve realizar a exclusão lógica do produto e retornar uma mensagem de sucesso com status 200 (OK).
      */
     @Test
-    void deveDeletarProdutoComSucesso() {
+    void deveDeletarProdutoComSucesso() throws Exception {
         doNothing().when(service).delete(1L);
 
-        ResponseEntity<String> response = controller.delete(1L);
+        mockMvc.perform(delete("/produtos/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Removido com sucesso."));
 
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Removido com sucesso.", response.getBody());
         verify(service, times(1)).delete(1L);
     }
 
@@ -120,18 +136,22 @@ class ProdutoControllerTest {
      * Deve retornar uma página (Page) contendo apenas produtos ativos com status 200 (OK).
      */
     @Test
-    void deveRetornarPaginaDeProdutosAtivos() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<ProdutoResponseDTO> page = new PageImpl<>(List.of(produtoDTO));
+    void deveRetornarPaginaDeProdutosAtivos() throws Exception {
+        Page<ProdutoResponseDTO> page = new PageImpl<>(List.of(produtoDTO), PageRequest.of(0, 10), 1);
 
-        when(service.findAllActive(null, "id,asc", pageable)).thenReturn(page);
+        when(service.findAllActive(isNull(), eq("id,asc"), any(Pageable.class))).thenReturn(page);
 
-        ResponseEntity<Page<ProdutoResponseDTO>> response = controller.findAllActive(null, "id,asc", pageable);
+        mockMvc.perform(get("/produtos")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "id,asc")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("Camisa Vermelha"))
+                .andExpect(jsonPath("$.totalElements").value(1));
 
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().getContent().size());
-        assertEquals("Camisa Vermelha", response.getBody().getContent().get(0).nome());
-        verify(service, times(1)).findAllActive(null, "id,asc", pageable);
+        verify(service, times(1)).findAllActive(isNull(), eq("id,asc"), any(Pageable.class));
     }
 
     /**
@@ -139,22 +159,25 @@ class ProdutoControllerTest {
      * Deve retornar uma página (Page) contendo apenas produtos com o campo {@code deletedAt} preenchido, com status 200 (OK).
      */
     @Test
-    void deveRetornarPaginaDeProdutosDeletados() {
-        Pageable pageable = PageRequest.of(0, 10);
-        ZonedDateTime time = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+    void deveRetornarPaginaDeProdutosDeletados() throws Exception {
         produtoDTO = new ProdutoResponseDTO(1L, "Camisa Vermelha", 1000,
                 Categorias.CLOTHES, time, time, time);
-        Page<ProdutoResponseDTO> page = new PageImpl<>(List.of(produtoDTO));
 
-        when(service.findAllDeleted(null, "id,asc", pageable)).thenReturn(page);
+        Page<ProdutoResponseDTO> page = new PageImpl<>(List.of(produtoDTO), PageRequest.of(0, 10), 1);
 
-        ResponseEntity<Page<ProdutoResponseDTO>> response = controller.findAllDeleted(null, "id,asc", pageable);
+        when(service.findAllDeleted(isNull(), eq("id,asc"), any(Pageable.class))).thenReturn(page);
 
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().getContent().size());
-        assertEquals("Camisa Vermelha", response.getBody().getContent().get(0).nome());
-        assertNotNull(response.getBody().getContent().get(0).deletedAt());
-        verify(service, times(1)).findAllDeleted(null, "id,asc", pageable);
+        mockMvc.perform(get("/produtos/apagados")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "id,asc")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("Camisa Vermelha"))
+                .andExpect(jsonPath("$.content[0].deletedAt").isNotEmpty());
+
+        verify(service, times(1)).findAllDeleted(isNull(), eq("id,asc"), any(Pageable.class));
     }
 
     /**
@@ -165,16 +188,14 @@ class ProdutoControllerTest {
     @Test
     void deveRetornarTotalDeProdutosComSucesso() throws Exception {
         TotalProdutosDTO dto = new TotalProdutosDTO(5, 1200);
-        when(service.calcularTotalDeProdutos(null)).thenReturn(dto);
+        when(service.calcularTotalDeProdutos(isNull())).thenReturn(dto);
 
-        ResponseEntity<TotalProdutosDTO> response = controller.calcularTotal(null);
+        mockMvc.perform(get("/produtos/calcular_total")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.qntProdutos").value(5))
+                .andExpect(jsonPath("$.precoMedio").value(1200));
 
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertEquals(5, response.getBody().qntProdutos());
-        assertEquals(1200, response.getBody().precoMedio());
-
-        verify(service, times(1)).calcularTotalDeProdutos(null);
+        verify(service, times(1)).calcularTotalDeProdutos(isNull());
     }
 }
