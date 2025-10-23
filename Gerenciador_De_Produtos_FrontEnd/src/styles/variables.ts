@@ -1,8 +1,8 @@
 export default {
   // Colors
-  secondaryColor: '#292929',
-  backgroundColor: '#212121',
-  fontColor: '#EEEEEE',
+  secondaryColor: '#DDDDDD',
+  backgroundColor: '#EEEEEE',
+  fontColor: '#111111',
 
   // Fonts
   fontFamily: 'Poppins, sans-serif'
