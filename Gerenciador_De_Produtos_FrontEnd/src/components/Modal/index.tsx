@@ -1,4 +1,5 @@
 import { type JSX, useEffect } from 'react'
+
 import { ModalContainer, ModalCard, Overlay } from './styles'
 
 type Props = {

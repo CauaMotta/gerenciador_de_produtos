@@ -6,12 +6,12 @@ import Select from 'react-select'
 import type { Option } from '../MainContent'
 
 import { useApiMutation } from '../../hooks/useApiMutation'
+import priceFormatter from '../../utils/priceFormatter'
+import categoriaConverter from '../../utils/categoriaConverter'
 
 import { Container, StyledSelectWrapper } from './styles'
 import { Button, StyledClipLoader } from '../../styles'
 import variables from '../../styles/variables'
-import priceFormatter from '../../utils/priceFormatter'
-import categoriaConverter from '../../utils/categoriaConverter'
 
 const options: Option[] = [
   { value: 'roupas', label: 'Roupas' },
