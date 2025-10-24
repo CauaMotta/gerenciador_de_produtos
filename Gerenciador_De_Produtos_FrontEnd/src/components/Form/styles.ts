@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+
 import variables from '../../styles/variables'
 import { Button } from '../../styles'
 
@@ -49,7 +50,6 @@ export const StyledSelectWrapper = styled.div`
     color: ${variables.fontColor};
   }
 
-  /* Control principal (área de input do react-select) */
   .custom-select__control {
     width: 100%;
     background-color: transparent;
@@ -71,12 +71,10 @@ export const StyledSelectWrapper = styled.div`
     }
   }
 
-  /* Texto da opção selecionada */
   .custom-select__single-value {
     color: ${variables.fontColor};
   }
 
-  /* Menu dropdown */
   .custom-select__menu {
     margin-top: 2px;
     border-radius: 0;
@@ -85,7 +83,6 @@ export const StyledSelectWrapper = styled.div`
     background-color: ${variables.backgroundColor};
   }
 
-  /* Opções da lista */
   .custom-select__option {
     padding: 10px 12px;
     cursor: pointer;

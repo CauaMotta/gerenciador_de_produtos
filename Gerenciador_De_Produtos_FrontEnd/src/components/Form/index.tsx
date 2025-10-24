@@ -1,13 +1,11 @@
-import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useFormik } from 'formik'
 import { IMaskInput } from 'react-imask'
 import Select from 'react-select'
 
-import type { Option } from '../MainContent'
-
-import { useApiMutation } from '../../hooks/useApiMutation'
 import priceFormatter from '../../utils/priceFormatter'
 import categoriaConverter from '../../utils/categoriaConverter'
+import { useApiMutation } from '../../hooks/useApiMutation'
 
 import { Container, StyledSelectWrapper } from './styles'
 import { Button, StyledClipLoader } from '../../styles'

@@ -284,7 +284,6 @@ class ProdutoServiceTest {
 
         TotalProdutosDTO resultado = service.calcularTotalDeProdutos(null);
 
-        // Assert
         assertEquals(0, resultado.qntProdutos());
         assertEquals(0, resultado.precoMedio());
     }

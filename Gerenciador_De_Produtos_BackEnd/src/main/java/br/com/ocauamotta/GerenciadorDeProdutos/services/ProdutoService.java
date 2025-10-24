@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Classe de Serviço responsável por implementar as regras de negócio
@@ -188,8 +187,6 @@ public class ProdutoService {
      * @param dto    O DTO de requisição com os dados de atualização.
      */
     private void updateEntity(Produto entity, ProdutoRequestDTO dto) {
-        LocalDateTime localDateTime = LocalDateTime.now();
-
         if (dto.nome() != null && !dto.nome().isBlank()) entity.setNome(dto.nome());
         if (dto.preco() != null) entity.setPreco(dto.preco());
         if (dto.categoria() != null && !dto.categoria().isBlank())

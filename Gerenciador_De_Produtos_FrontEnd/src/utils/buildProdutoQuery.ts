@@ -1,5 +1,3 @@
-import type { Option } from '../components/MainContent'
-
 export default (
   selectedOption: Option | null,
   priceSort: boolean,

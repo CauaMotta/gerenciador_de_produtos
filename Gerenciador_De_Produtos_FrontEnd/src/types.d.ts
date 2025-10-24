@@ -18,3 +18,8 @@ declare type Statistics = {
   qntProdutos: number
   precoMedio: number
 }
+
+declare type Option = {
+  value: string
+  label: string
+}

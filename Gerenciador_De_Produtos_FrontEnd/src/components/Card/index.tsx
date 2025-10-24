@@ -1,16 +1,15 @@
 import { useState } from 'react'
 
 import Modal from '../Modal'
+import Form from '../Form'
 
 import dateFormatter from '../../utils/dateFormatter'
 import priceFormatter from '../../utils/priceFormatter'
-
 import { useApiMutation } from '../../hooks/useApiMutation'
 
 import { Button, StyledClipLoader } from '../../styles'
 import { ModalContent, Container } from './styles'
 import variables from '../../styles/variables'
-import Form from '../Form'
 
 type Props = {
   produto: Produto

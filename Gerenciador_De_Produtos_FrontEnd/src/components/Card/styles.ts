@@ -8,11 +8,13 @@ export const Container = styled.div`
   margin-bottom: 16px;
   max-width: 618px;
   width: 100%;
-
   background-color: ${variables.secondaryColor};
-
   display: flex;
   flex-direction: column;
+
+  &:hover {
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.07);
+  }
 
   .card-content {
     display: flex;

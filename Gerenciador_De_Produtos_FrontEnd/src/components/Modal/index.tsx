@@ -38,7 +38,7 @@ const Modal = ({ isOpen, onClose, title, children }: Props) => {
           <header className="modal-header">
             <h3>{title}</h3>
             <button onClick={onClose} aria-label="Fechar">
-              ✕
+              <i className="fa-solid fa-xmark"></i>
             </button>
           </header>
         )}

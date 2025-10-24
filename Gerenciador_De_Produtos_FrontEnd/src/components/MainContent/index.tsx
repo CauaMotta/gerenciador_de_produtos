@@ -1,19 +1,17 @@
 import { useState } from 'react'
 import Select, { type SingleValue } from 'react-select'
 
-import { useApi } from '../../hooks/useApi'
-import priceFormatter from '../../utils/priceFormatter'
-import buildProdutoQuery from '../../utils/buildProdutoQuery'
-
 import Modal from '../Modal'
 import Card from '../Card'
 import Form from '../Form'
 
+import priceFormatter from '../../utils/priceFormatter'
+import buildProdutoQuery from '../../utils/buildProdutoQuery'
+import { useApi } from '../../hooks/useApi'
+
 import { Container, Title, StyledSelectWrapper, Content } from './styles'
 import { Button, StyledClipLoader, Line } from '../../styles'
 import variables from '../../styles/variables'
-
-export type Option = { value: string; label: string }
 
 const options: Option[] = [
   { value: 'todas', label: 'Todas' },

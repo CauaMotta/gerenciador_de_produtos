@@ -26,6 +26,32 @@ export const Title = styled.h1`
   text-align: center;
 `
 
+export const Content = styled.main`
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  ${Button} {
+    margin-bottom: 32px;
+    background-color: ${variables.secondaryColor};
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .warning {
+    text-align: center;
+    font-size: 16px;
+    opacity: 0.7;
+
+    i {
+      font-size: 24px;
+    }
+  }
+`
+
 export const StyledSelectWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -80,31 +106,5 @@ export const StyledSelectWrapper = styled.div`
   .custom-select__option--is-selected {
     background: ${variables.secondaryColor};
     color: ${variables.fontColor};
-  }
-`
-
-export const Content = styled.main`
-  margin-top: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  ${Button} {
-    margin-bottom: 32px;
-    background-color: ${variables.secondaryColor};
-    &:hover {
-      opacity: 0.9;
-    }
-  }
-
-  .warning {
-    text-align: center;
-    font-size: 16px;
-    opacity: 0.7;
-
-    i {
-      font-size: 24px;
-    }
   }
 `
