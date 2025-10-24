@@ -29,7 +29,7 @@ cd Gerenciador_De_Produtos_BackEnd
 
 # Necessário configurar o banco de dados Postgres e as váriaveis de ambiente
 
-#2º passo: executar o servidor frontend
+# 2º passo: executar o servidor frontend
 # Acesse a pasta
 cd ../Gerenciador_De_Produtos_FrontEnd
 
@@ -59,7 +59,7 @@ npm run preview
 
 ### DTOs (Data Transfer Objects)
 
-Implementei DTOs para trafegar dados entre o cliente e a API. Essa abordagem aumenta a segurança e desacopla a entidade Produto do banco de dados, evitando exposição direta dos modelos internos da aplicação.
+Implementei DTOs para trafegar dados entre o cliente e a API. Essa abordagem aumenta a segurança e desacopla a entidade Produto, evitando exposição direta dos modelos internos da aplicação.
 
 ### Tratamento de Exceções
 
